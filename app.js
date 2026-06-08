@@ -79,19 +79,24 @@ document.addEventListener('DOMContentLoaded', () => {
             conn.addEventListener('change', updateNetworkStatusUI);
         }
 
-        // Configure HLS.js with resilient recovery configurations
+        // Configure HLS.js with resilient recovery configurations optimized for fast start
         const hlsConfig = {
             enableWorker: true,
             lowLatencyMode: !isConnectionSlow,
-            backBufferLength: isConnectionSlow ? 15 : 30,
-            maxBufferLength: isConnectionSlow ? 45 : 30,
-            maxMaxBufferLength: isConnectionSlow ? 90 : 60,
-            manifestLoadingMaxRetry: 8,
-            manifestLoadingRetryDelay: 1500,
-            levelLoadingMaxRetry: 8,
-            levelLoadingRetryDelay: 1500,
-            liveSyncPosition: isConnectionSlow ? 12 : 5,
-            liveMaxLatencyDuration: isConnectionSlow ? 25 : 10
+            backBufferLength: 10,
+            maxBufferLength: isConnectionSlow ? 20 : 10, // Buffer less content initially for instant start
+            maxMaxBufferLength: isConnectionSlow ? 40 : 20,
+            manifestLoadingMaxRetry: 6,
+            manifestLoadingRetryDelay: 1000,
+            levelLoadingMaxRetry: 6,
+            levelLoadingRetryDelay: 1000,
+            fragLoadingMaxRetry: 6,
+            fragLoadingRetryDelay: 1000,
+            liveSyncDurationCount: 2, // Starts playing 2 segments back instead of 3, reducing initial data needed
+            maxBufferHole: 0.5,
+            nudgeMaxRetries: 10,
+            nudgeDelay: 100,
+            maxFragLookUpTolerance: 0.25
         };
 
         if (Hls.isSupported()) {
