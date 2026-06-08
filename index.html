@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SPC Canal 15 - Señal en Vivo</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="styles.css">
+    <!-- HLS JS Library -->
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+</head>
+<body>
+
+    <!-- Header Navigation -->
+    <header class="app-header">
+        <div class="header-container">
+            <a href="#" class="brand">
+                <img src="LOGO.jpg" alt="SPC Canal 15 Logo" class="brand-logo" id="main-logo">
+                <span class="brand-name">SPC CANAL 15</span>
+            </a>
+            <nav class="nav-menu">
+                <a href="#inicio" class="nav-link active">Inicio</a>
+                <a href="#programacion" class="nav-link">Programación</a>
+                <a href="#contacto" class="nav-link">Contacto</a>
+            </nav>
+            <div class="live-badge-container">
+                <span class="live-dot pulse"></span>
+                <span class="live-text">EN VIVO</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main id="inicio" class="main-content">
+        
+        <!-- Hero Section with Live Stream Player -->
+        <section class="hero-section">
+            <div class="hero-background"></div>
+            <div class="container hero-container">
+                
+                <div class="hero-info">
+                    <h1 class="hero-title">Sintoniza la señal de <span class="gradient-text">SPC Canal 15</span></h1>
+                    <p class="hero-description">Mantente informado con las noticias de último minuto, reportes al instante, cultura, entretenimiento y toda nuestra programación en vivo las 24 horas.</p>
+                    <div class="hero-actions">
+                        <a href="#contacto" class="btn btn-secondary">Reportar una Noticia</a>
+                    </div>
+                </div>
+
+                <!-- Live Stream Video Player Container -->
+                <div class="player-wrapper">
+                    <div class="player-container" id="video-player-container">
+                        <video id="live-video" playsinline></video>
+                        
+                        <!-- Overlay: Loading & Error Status -->
+                        <div class="player-overlay" id="player-overlay">
+                            <div class="overlay-spinner" id="overlay-spinner"></div>
+                            <div class="overlay-message" id="overlay-message">Cargando transmisión en vivo...</div>
+                            <button class="overlay-btn" id="overlay-retry-btn" style="display: none;">Reconectar Ahora</button>
+                        </div>
+
+                        <!-- Custom Controls Overlay -->
+                        <div class="custom-controls" id="custom-controls">
+                            <!-- Bottom control bar -->
+                            <div class="control-bar">
+                                <button class="control-btn" id="play-pause-btn" aria-label="Play/Pause">
+                                    <svg class="icon-play" viewBox="0 0 24 24" width="24" height="24">
+                                        <path fill="currentColor" d="M8 5v14l11-7z"/>
+                                    </svg>
+                                    <svg class="icon-pause" viewBox="0 0 24 24" width="24" height="24" style="display: none;">
+                                        <path fill="currentColor" d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+                                    </svg>
+                                </button>
+                                
+                                <div class="volume-container">
+                                    <button class="control-btn" id="mute-btn" aria-label="Mute/Unmute">
+                                        <svg class="icon-volume-high" viewBox="0 0 24 24" width="24" height="24">
+                                            <path fill="currentColor" d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+                                        </svg>
+                                        <svg class="icon-volume-muted" viewBox="0 0 24 24" width="24" height="24" style="display: none;">
+                                            <path fill="currentColor" d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.21.05-.42.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.03c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/>
+                                        </svg>
+                                    </button>
+                                    <input type="range" class="volume-slider" id="volume-slider" min="0" max="1" step="0.05" value="0.8" aria-label="Volumen">
+                                </div>
+
+                                <div class="player-live-indicator">
+                                    <span class="live-dot pulse"></span>
+                                    <span>EN VIVO</span>
+                                    <span class="connection-status" id="connection-status">Estable</span>
+                                </div>
+
+                                <div class="spacer"></div>
+
+                                <button class="control-btn" id="fullscreen-btn" aria-label="Fullscreen">
+                                    <svg class="icon-fullscreen" viewBox="0 0 24 24" width="24" height="24">
+                                        <path fill="currentColor" d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>
+                                    </svg>
+                                    <svg class="icon-exit-fullscreen" viewBox="0 0 24 24" width="24" height="24" style="display: none;">
+                                        <path fill="currentColor" d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Program Schedule Section -->
+        <section id="programacion" class="section program-section">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-tag">Programación</span>
+                    <h2 class="section-title">Nuestra Grilla de Contenidos</h2>
+                    <p class="section-subtitle">No te pierdas de tus programas favoritos. Transmisiones especiales y producción nacional los 7 días de la semana.</p>
+                </div>
+
+                <div class="program-grid">
+                    <!-- Card 1 -->
+                    <div class="program-card">
+                        <div class="program-time">06:00 - 08:30</div>
+                        <div class="program-info">
+                            <h3 class="program-name">Despertar Nacional</h3>
+                            <p class="program-desc">El resumen de noticias más temprano del país con enlaces en vivo y reportes del tráfico.</p>
+                        </div>
+                    </div>
+
+                    <!-- Card 2 (Highlight current) -->
+                    <div class="program-card current">
+                        <div class="program-badge">AHORA EN VIVO</div>
+                        <div class="program-time">08:30 - 12:30</div>
+                        <div class="program-info">
+                            <h3 class="program-name">La Mañana de Canal 15</h3>
+                            <p class="program-desc">Revista matinal con entrevistas, cocina, tendencias, y la mejor energía para empezar el día.</p>
+                        </div>
+                    </div>
+
+                    <!-- Card 3 -->
+                    <div class="program-card">
+                        <div class="program-time">12:30 - 14:00</div>
+                        <div class="program-info">
+                            <h3 class="program-name">SPC Informativo Meridiano</h3>
+                            <p class="program-desc">Toda la información de la jornada a nivel nacional e internacional analizada en detalle.</p>
+                        </div>
+                    </div>
+
+                    <!-- Card 4 -->
+                    <div class="program-card">
+                        <div class="program-time">14:00 - 17:00</div>
+                        <div class="program-info">
+                            <h3 class="program-name">Tarde Deportiva & Cine</h3>
+                            <p class="program-desc">El acontecer del deporte local e internacional seguido del mejor cine familiar.</p>
+                        </div>
+                    </div>
+
+                    <!-- Card 5 -->
+                    <div class="program-card">
+                        <div class="program-time">17:00 - 19:00</div>
+                        <div class="program-info">
+                            <h3 class="program-name">Conexión Juvenil</h3>
+                            <p class="program-desc">Música, redes sociales, tecnología y entretenimiento interactivo para jóvenes.</p>
+                        </div>
+                    </div>
+
+                    <!-- Card 6 -->
+                    <div class="program-card">
+                        <div class="program-time">19:00 - 21:00</div>
+                        <div class="program-info">
+                            <h3 class="program-name">SPC Informativo Central</h3>
+                            <p class="program-desc">El noticiero estelar del canal con los reportajes más completos e investigaciones periodísticas.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact & WhatsApp Box Section -->
+        <section id="contacto" class="section contact-section">
+            <div class="container">
+                <div class="contact-box glass-panel">
+                    <div class="contact-illustration">
+                        <!-- Custom Newsroom Icon SVG -->
+                        <div class="custom-icon-wrapper">
+                            <svg class="illustration-svg" viewBox="0 0 24 24" width="80" height="80">
+                                <path fill="currentColor" d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="contact-text-content">
+                        <span class="contact-tag">Línea de Denuncias y Consultas</span>
+                        <h2 class="contact-title">¿Tienes una primicia o necesitas ayuda?</h2>
+                        <p class="contact-desc">Escríbenos directamente a nuestra redacción. Envíanos fotos, videos, sugerencias o haz tus denuncias ciudadanas de manera confidencial y rápida a través de WhatsApp. Estamos atentos las 24 horas.</p>
+                        
+                        <div class="contact-meta">
+                            <div class="meta-item">
+                                <span class="meta-dot"></span>
+                                <span>Atención Inmediata</span>
+                            </div>
+                            <div class="meta-item">
+                                <span class="meta-dot"></span>
+                                <span>100% Confidencial</span>
+                            </div>
+                        </div>
+
+                        <!-- Direct WhatsApp Link Button -->
+                        <a href="https://wa.me/59174758244?text=Hola%20SPC%20Canal%2015,%20deseo%20realizar%20una%20consulta%20o%20denuncia." target="_blank" rel="noopener noreferrer" class="btn btn-whatsapp">
+                            <svg class="icon-whatsapp" viewBox="0 0 24 24" width="24" height="24">
+                                <path fill="currentColor" d="M12.031 2C6.479 2 2 6.479 2 12.03c0 2.217.72 4.269 1.944 5.92L2.68 22.23a.625.625 0 0 0 .766.766l4.28-1.264a9.96 9.96 0 0 0 4.305 1C17.581 22.732 22 18.253 22 12.702 22 7.151 17.581 2 12.031 2zm.05 18.57a8.55 8.55 0 0 1-3.957-.974.624.624 0 0 0-.547-.047l-2.732.808.808-2.732a.624.624 0 0 0-.047-.547 8.548 8.548 0 0 1-.974-3.957c0-4.75 3.864-8.614 8.614-8.614 4.75 0 8.614 3.864 8.614 8.614 0 4.75-3.864 8.614-8.614 8.614zm3.923-5.32c-.215-.108-1.272-.63-1.468-.7-.197-.072-.34-.108-.483.108-.143.216-.556.702-.68.844-.125.143-.25.16-.465.053a5.86 5.86 0 0 1-1.728-1.07 6.47 6.47 0 0 1-1.196-1.492c-.125-.215-.013-.332.094-.438.096-.096.216-.25.323-.377.108-.125.143-.215.215-.36a.4.4 0 0 0-.02-.377c-.055-.108-.484-1.17-.663-1.602-.175-.422-.35-.365-.483-.372l-.412-.008a.79.79 0 0 0-.573.267c-.197.215-.753.737-.753 1.796 0 1.06.772 2.083.88 2.227.107.144 1.52 2.32 3.682 3.25.514.22 1.157.353 1.554.48.514.163 1.042.14 1.434.08.438-.065 1.272-.52 1.452-1.023.18-.503.18-.934.125-1.023-.054-.09-.197-.143-.412-.25z"/>
+                            </svg>
+                            <span>WhatsApp Redacción (+591 74758244)</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+        <div class="container footer-container">
+            <div class="footer-brand">
+                <img src="LOGO.jpg" alt="SPC Canal 15 Logo" class="footer-logo">
+                <span class="footer-title">SPC Canal 15</span>
+                <p class="footer-slogan">Llegando a cada hogar con la verdad y entretenimiento.</p>
+            </div>
+            
+            <div class="footer-links-group">
+                <h4>Navegación</h4>
+                <a href="#inicio">Inicio</a>
+                <a href="#programacion">Programación</a>
+                <a href="#contacto">Contacto</a>
+            </div>
+
+            <div class="footer-contact-info">
+                <h4>Contacto Directo</h4>
+                <p><strong>Número:</strong> +591 74758244</p>
+                <p><strong>E-mail:</strong> contacto@spccanal15.com</p>
+                <p>Bolivia</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div class="container footer-bottom-container">
+                <p>&copy; 2026 SPC Canal 15. Todos los derechos reservados.</p>
+                <p>Señal de Streaming en Vivo</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Floating WhatsApp Action Button -->
+    <div class="floating-whatsapp-container">
+        <span class="whatsapp-tooltip">¿Tienes una denuncia? ¡Escríbenos!</span>
+        <a href="https://wa.me/59174758244?text=Hola%20SPC%20Canal%2015,%20deseo%20realizar%20una%20consulta%20o%20denuncia." target="_blank" rel="noopener noreferrer" class="floating-whatsapp-btn" aria-label="Escríbenos por WhatsApp">
+            <svg viewBox="0 0 24 24" width="30" height="30">
+                <path fill="currentColor" d="M12.031 2C6.479 2 2 6.479 2 12.03c0 2.217.72 4.269 1.944 5.92L2.68 22.23a.625.625 0 0 0 .766.766l4.28-1.264a9.96 9.96 0 0 0 4.305 1C17.581 22.732 22 18.253 22 12.702 22 7.151 17.581 2 12.031 2zm.05 18.57a8.55 8.55 0 0 1-3.957-.974.624.624 0 0 0-.547-.047l-2.732.808.808-2.732a.624.624 0 0 0-.047-.547 8.548 8.548 0 0 1-.974-3.957c0-4.75 3.864-8.614 8.614-8.614 4.75 0 8.614 3.864 8.614 8.614 0 4.75-3.864 8.614-8.614 8.614zm3.923-5.32c-.215-.108-1.272-.63-1.468-.7-.197-.072-.34-.108-.483.108-.143.216-.556.702-.68.844-.125.143-.25.16-.465.053a5.86 5.86 0 0 1-1.728-1.07 6.47 6.47 0 0 1-1.196-1.492c-.125-.215-.013-.332.094-.438.096-.096.216-.25.323-.377.108-.125.143-.215.215-.36a.4.4 0 0 0-.02-.377c-.055-.108-.484-1.17-.663-1.602-.175-.422-.35-.365-.483-.372l-.412-.008a.79.79 0 0 0-.573.267c-.197.215-.753.737-.753 1.796 0 1.06.772 2.083.88 2.227.107.144 1.52 2.32 3.682 3.25.514.22 1.157.353 1.554.48.514.163 1.042.14 1.434.08.438-.065 1.272-.52 1.452-1.023.18-.503.18-.934.125-1.023-.054-.09-.197-.143-.412-.25z"/>
+            </svg>
+        </a>
+    </div>
+
+    <!-- Application Javascript -->
+    <script src="app.js"></script>
+</body>
+</html>

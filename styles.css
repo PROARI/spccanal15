@@ -1,0 +1,1012 @@
+/* ==========================================================================
+   SPC Canal 15 - Premium Stylesheet
+   ========================================================================== */
+
+/* Design Tokens & Variables */
+:root {
+    --bg-dark: #080b11;
+    --bg-card: rgba(22, 28, 45, 0.45);
+    --bg-card-hover: rgba(30, 39, 62, 0.6);
+    --border-color: rgba(255, 255, 255, 0.08);
+    --border-accent: rgba(6, 182, 212, 0.3);
+    
+    --color-text: #f3f4f6;
+    --color-text-muted: #9ca3af;
+    --color-primary: #3b82f6;
+    --color-primary-glow: rgba(59, 130, 246, 0.35);
+    --color-accent: #06b6d4;
+    --color-accent-glow: rgba(6, 182, 212, 0.35);
+    --color-live: #ef4444;
+    --color-live-glow: rgba(239, 68, 68, 0.5);
+    --color-whatsapp: #25d366;
+    --color-whatsapp-glow: rgba(37, 211, 102, 0.35);
+    
+    --font-main: 'Outfit', sans-serif;
+    --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    
+    --shadow-sm: 0 2px 8px -1px rgba(0, 0, 0, 0.2);
+    --shadow-md: 0 4px 20px -2px rgba(0, 0, 0, 0.3);
+    --shadow-lg: 0 10px 40px -3px rgba(0, 0, 0, 0.5);
+    --shadow-accent: 0 0 20px rgba(6, 182, 212, 0.15);
+}
+
+/* Reset & Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    scroll-behavior: smooth;
+}
+
+body {
+    background-color: var(--bg-dark);
+    color: var(--color-text);
+    font-family: var(--font-main);
+    line-height: 1.6;
+    overflow-x: hidden;
+    background-image: 
+        radial-gradient(circle at 10% 20%, rgba(59, 130, 246, 0.05) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(6, 182, 212, 0.05) 0%, transparent 40%);
+    background-attachment: fixed;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+button {
+    font-family: inherit;
+    border: none;
+    background: none;
+    cursor: pointer;
+    outline: none;
+}
+
+.container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+/* Typography Utilities */
+.gradient-text {
+    background: linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Glassmorphism Panel */
+.glass-panel {
+    background: var(--bg-card);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    box-shadow: var(--shadow-md);
+}
+
+/* Animations */
+@keyframes pulse {
+    0% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 var(--color-live-glow);
+    }
+    70% {
+        transform: scale(1);
+        box-shadow: 0 0 0 8px rgba(239, 68, 68, 0);
+    }
+    100% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+    }
+}
+
+@keyframes pulse-whatsapp {
+    0% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 var(--color-whatsapp-glow);
+    }
+    70% {
+        transform: scale(1);
+        box-shadow: 0 0 0 10px rgba(37, 211, 102, 0);
+    }
+    100% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(37, 211, 102, 0);
+    }
+}
+
+@keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.pulse {
+    animation: pulse 2s infinite;
+}
+
+/* Buttons */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 24px;
+    font-weight: 600;
+    border-radius: 30px;
+    transition: var(--transition-normal);
+    font-size: 0.95rem;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 100%);
+    color: white;
+    box-shadow: var(--shadow-sm);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px -10px var(--color-accent-glow);
+}
+
+.btn-secondary {
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--color-text);
+    border: 1px solid var(--border-color);
+}
+
+.btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateY(-2px);
+}
+
+.btn-whatsapp {
+    background-color: var(--color-whatsapp);
+    color: white;
+    box-shadow: 0 4px 14px var(--color-whatsapp-glow);
+}
+
+.btn-whatsapp:hover {
+    background-color: #20ba56;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px var(--color-whatsapp-glow);
+}
+
+/* ==========================================================================
+   Header & Navigation
+   ========================================================================== */
+.app-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(8, 11, 17, 0.75);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border-color);
+    height: 70px;
+    transition: var(--transition-normal);
+}
+
+.header-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.brand-logo {
+    height: 44px;
+    width: auto;
+    border-radius: 8px;
+    object-fit: cover;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.brand-name {
+    font-size: 1.25rem;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    background: linear-gradient(135deg, #fff 40%, var(--color-text-muted) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.nav-menu {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+}
+
+.nav-link {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--color-text-muted);
+    transition: var(--transition-fast);
+    position: relative;
+    padding: 6px 0;
+}
+
+.nav-link:hover, .nav-link.active {
+    color: white;
+}
+
+.nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
+    transition: var(--transition-normal);
+}
+
+.nav-link:hover::after, .nav-link.active::after {
+    width: 100%;
+}
+
+.live-badge-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    padding: 6px 14px;
+    border-radius: 30px;
+}
+
+.live-dot {
+    width: 8px;
+    height: 8px;
+    background-color: var(--color-live);
+    border-radius: 50%;
+}
+
+.live-text {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--color-live);
+    letter-spacing: 1px;
+}
+
+/* ==========================================================================
+   Hero & Live Stream Player Section
+   ========================================================================== */
+.hero-section {
+    position: relative;
+    padding: 60px 0 80px 0;
+    min-height: calc(100vh - 70px);
+    display: flex;
+    align-items: center;
+}
+
+.hero-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        radial-gradient(ellipse at top right, rgba(59, 130, 246, 0.08) 0%, transparent 60%),
+        radial-gradient(ellipse at bottom left, rgba(6, 182, 212, 0.08) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 1;
+}
+
+.hero-container {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 48px;
+    align-items: center;
+}
+
+.hero-info {
+    max-width: 500px;
+}
+
+.hero-title {
+    font-size: 2.8rem;
+    line-height: 1.15;
+    font-weight: 800;
+    margin-bottom: 20px;
+    letter-spacing: -1px;
+}
+
+.hero-description {
+    font-size: 1.1rem;
+    color: var(--color-text-muted);
+    margin-bottom: 32px;
+    line-height: 1.7;
+}
+
+.hero-actions {
+    display: flex;
+    gap: 16px;
+}
+
+/* Video Player Styling */
+.player-wrapper {
+    width: 100%;
+    max-width: 650px;
+    justify-self: center;
+}
+
+.player-container {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border-radius: 16px;
+    overflow: hidden;
+    background-color: black;
+    box-shadow: 
+        0 20px 40px -10px rgba(0,0,0,0.7),
+        0 0 0 1px var(--border-color),
+        var(--shadow-accent);
+    transition: var(--transition-normal);
+}
+
+.player-container:hover {
+    box-shadow: 
+        0 25px 50px -12px rgba(0,0,0,0.8),
+        0 0 0 1px rgba(6, 182, 212, 0.25),
+        0 0 30px rgba(6, 182, 212, 0.2);
+}
+
+.player-container video {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+}
+
+/* Custom Overlays inside Player */
+.player-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(8, 11, 17, 0.85);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 5;
+    transition: var(--transition-normal);
+    padding: 24px;
+    text-align: center;
+}
+
+.overlay-spinner {
+    width: 48px;
+    height: 48px;
+    border: 3.5px solid rgba(6, 182, 212, 0.15);
+    border-radius: 50%;
+    border-top-color: var(--color-accent);
+    animation: rotate 1s linear infinite;
+    margin-bottom: 20px;
+}
+
+.overlay-message {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--color-text);
+    margin-bottom: 20px;
+    max-width: 320px;
+}
+
+.overlay-btn {
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 100%);
+    color: white;
+    font-weight: 600;
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition-fast);
+}
+
+.overlay-btn:hover {
+    transform: scale(1.05);
+}
+
+/* Custom Controls Bar styling */
+.custom-controls {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.4) 60%, rgba(0, 0, 0, 0) 100%);
+    padding: 24px 16px 14px 16px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(8px);
+    transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s ease;
+    z-index: 6;
+}
+
+/* Show controls when player active/hovered */
+.player-container:hover .custom-controls,
+.player-container.controls-active .custom-controls {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.control-bar {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    width: 100%;
+}
+
+.control-btn {
+    color: rgba(255,255,255,0.85);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.08);
+    transition: var(--transition-fast);
+}
+
+.control-btn:hover {
+    color: white;
+    background: rgba(255,255,255,0.18);
+    transform: scale(1.08);
+}
+
+.control-btn svg {
+    display: block;
+}
+
+/* Volume Slider */
+.volume-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.volume-slider {
+    width: 0;
+    opacity: 0;
+    height: 4px;
+    border-radius: 2px;
+    background: rgba(255,255,255,0.2);
+    outline: none;
+    -webkit-appearance: none;
+    appearance: none;
+    cursor: pointer;
+    transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease;
+}
+
+.volume-slider::-webkit-slider-runnable-track {
+    height: 4px;
+}
+
+.volume-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: var(--color-accent);
+    margin-top: -4px;
+    box-shadow: 0 0 6px rgba(6, 182, 212, 0.6);
+}
+
+.volume-container:hover .volume-slider,
+.volume-slider:focus {
+    width: 70px;
+    opacity: 1;
+}
+
+.player-live-indicator {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    background: rgba(239, 68, 68, 0.15);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    padding: 4px 10px;
+    border-radius: 12px;
+    letter-spacing: 0.5px;
+}
+
+.player-live-indicator .live-dot {
+    width: 6px;
+    height: 6px;
+}
+
+.connection-status {
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.5);
+    margin-left: 6px;
+    border-left: 1px solid rgba(255, 255, 255, 0.2);
+    padding-left: 6px;
+    font-weight: 500;
+}
+
+.spacer {
+    flex-grow: 1;
+}
+
+/* ==========================================================================
+   Program Schedule Section Styles
+   ========================================================================== */
+.section {
+    padding: 90px 0;
+}
+
+.section-header {
+    text-align: center;
+    max-width: 600px;
+    margin: 0 auto 56px auto;
+}
+
+.section-tag {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--color-accent);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 12px;
+    display: inline-block;
+}
+
+.section-title {
+    font-size: 2.2rem;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    margin-bottom: 16px;
+}
+
+.section-subtitle {
+    font-size: 1.05rem;
+    color: var(--color-text-muted);
+}
+
+.program-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+}
+
+.program-card {
+    background: rgba(22, 28, 45, 0.25);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 28px;
+    transition: var(--transition-normal);
+    position: relative;
+    overflow: hidden;
+}
+
+.program-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background-color: transparent;
+    transition: var(--transition-normal);
+}
+
+.program-card:hover {
+    background: var(--bg-card-hover);
+    transform: translateY(-4px);
+    border-color: rgba(255,255,255,0.15);
+    box-shadow: var(--shadow-md);
+}
+
+.program-card:hover::before {
+    background-color: var(--color-primary);
+}
+
+.program-time {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--color-accent);
+    margin-bottom: 12px;
+}
+
+.program-name {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 10px;
+}
+
+.program-desc {
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+    line-height: 1.5;
+}
+
+/* Highlight Current Active Show Card */
+.program-card.current {
+    background: rgba(6, 182, 212, 0.05);
+    border-color: var(--border-accent);
+    box-shadow: var(--shadow-accent);
+}
+
+.program-card.current::before {
+    background: linear-gradient(to bottom, var(--color-primary), var(--color-accent));
+}
+
+.program-badge {
+    position: absolute;
+    top: 14px;
+    right: 18px;
+    font-size: 0.65rem;
+    font-weight: 800;
+    color: var(--color-accent);
+    background: rgba(6, 182, 212, 0.15);
+    padding: 4px 10px;
+    border-radius: 10px;
+    border: 1px solid var(--border-accent);
+    letter-spacing: 0.5px;
+}
+
+/* ==========================================================================
+   Contact & WhatsApp Submission Section
+   ========================================================================== */
+.contact-section {
+    position: relative;
+}
+
+.contact-box {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 48px;
+    padding: 56px;
+    align-items: center;
+}
+
+.contact-illustration {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.custom-icon-wrapper {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(6, 182, 212, 0.1) 100%);
+    border: 1px solid var(--border-accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-accent);
+    box-shadow: var(--shadow-accent);
+}
+
+.contact-tag {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--color-accent);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    display: inline-block;
+    margin-bottom: 8px;
+}
+
+.contact-title {
+    font-size: 2.2rem;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    margin-bottom: 16px;
+    line-height: 1.2;
+}
+
+.contact-desc {
+    color: var(--color-text-muted);
+    font-size: 1.05rem;
+    margin-bottom: 24px;
+    line-height: 1.6;
+}
+
+.contact-meta {
+    display: flex;
+    gap: 24px;
+    margin-bottom: 32px;
+}
+
+.meta-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--color-text);
+}
+
+.meta-dot {
+    width: 6px;
+    height: 6px;
+    background-color: var(--color-accent);
+    border-radius: 50%;
+}
+
+/* Icon integration */
+.icon-whatsapp {
+    margin-right: 4px;
+}
+
+/* ==========================================================================
+   Footer
+   ========================================================================== */
+.app-footer {
+    background-color: #04060a;
+    border-top: 1px solid var(--border-color);
+    padding: 64px 0 0 0;
+}
+
+.footer-container {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 64px;
+    margin-bottom: 48px;
+}
+
+.footer-brand {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    max-width: 340px;
+}
+
+.footer-logo {
+    height: 48px;
+    width: auto;
+    align-self: flex-start;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.footer-title {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: white;
+}
+
+.footer-slogan {
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+}
+
+.footer-links-group {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.footer-links-group h4,
+.footer-contact-info h4 {
+    color: white;
+    font-size: 0.95rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+}
+
+.footer-links-group a {
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+    transition: var(--transition-fast);
+}
+
+.footer-links-group a:hover {
+    color: white;
+    transform: translateX(4px);
+}
+
+.footer-contact-info p {
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+    margin-bottom: 12px;
+}
+
+.footer-bottom {
+    border-top: 1px solid rgba(255,255,255,0.05);
+    padding: 24px 0;
+}
+
+.footer-bottom-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+}
+
+/* ==========================================================================
+   Floating WhatsApp Button Widget
+   ========================================================================== */
+.floating-whatsapp-container {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    z-index: 90;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.floating-whatsapp-btn {
+    width: 60px;
+    height: 60px;
+    background-color: var(--color-whatsapp);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 6px 20px rgba(37, 211, 102, 0.4);
+    animation: pulse-whatsapp 2s infinite;
+    transition: var(--transition-normal);
+}
+
+.floating-whatsapp-btn:hover {
+    transform: scale(1.08) rotate(8deg);
+    background-color: #20ba56;
+}
+
+.whatsapp-tooltip {
+    background: #1e293b;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--border-color);
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(15px);
+    transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s ease;
+}
+
+.floating-whatsapp-container:hover .whatsapp-tooltip {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(0);
+}
+
+/* ==========================================================================
+   Responsive Breakpoints & Adjustments
+   ========================================================================== */
+
+/* Tablet Portrait & Medium devices */
+@media (max-width: 992px) {
+    .hero-container {
+        grid-template-columns: 1fr;
+        text-align: center;
+        gap: 32px;
+        padding-top: 20px;
+    }
+    
+    .hero-info {
+        max-width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .hero-title {
+        font-size: 2.3rem;
+    }
+    
+    .hero-actions {
+        justify-content: center;
+    }
+    
+    .player-wrapper {
+        max-width: 100%;
+    }
+    
+    .program-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .contact-box {
+        grid-template-columns: 1fr;
+        padding: 40px;
+        text-align: center;
+        gap: 24px;
+    }
+    
+    .contact-illustration {
+        order: -1;
+    }
+    
+    .contact-meta {
+        justify-content: center;
+    }
+    
+    .footer-container {
+        grid-template-columns: 1.5fr 1fr;
+        gap: 40px;
+    }
+    
+    .footer-contact-info {
+        grid-column: span 2;
+    }
+}
+
+/* Mobile Devices */
+@media (max-width: 768px) {
+    .header-container {
+        padding: 0 16px;
+    }
+    
+    .nav-menu {
+        display: none; /* Auto-collapses link menu on mobile for visual cleanliness */
+    }
+    
+    .brand-name {
+        font-size: 1.1rem;
+    }
+    
+    .hero-title {
+        font-size: 1.9rem;
+    }
+    
+    .hero-description {
+        font-size: 1rem;
+    }
+    
+    .program-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .footer-container {
+        grid-template-columns: 1fr;
+        gap: 32px;
+    }
+    
+    .footer-contact-info {
+        grid-column: span 1;
+    }
+    
+    .footer-bottom-container {
+        flex-direction: column;
+        gap: 12px;
+        text-align: center;
+    }
+    
+    .floating-whatsapp-container {
+        bottom: 20px;
+        right: 20px;
+    }
+    
+    .floating-whatsapp-btn {
+        width: 52px;
+        height: 52px;
+    }
+    
+    .whatsapp-tooltip {
+        display: none; /* Hide tooltip on mobile to avoid screen overlap */
+    }
+}
