@@ -1010,3 +1010,121 @@ button {
         display: none; /* Hide tooltip on mobile to avoid screen overlap */
     }
 }
+
+/* Quality Selector Controls */
+.quality-container {
+    position: relative;
+    display: inline-block;
+}
+
+.quality-dropdown {
+    position: absolute;
+    bottom: 50px;
+    right: 0;
+    background: rgba(8, 11, 17, 0.95);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 8px 0;
+    min-width: 140px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px);
+    transition: opacity var(--transition-fast), transform var(--transition-fast), visibility var(--transition-fast);
+    z-index: 100;
+    box-shadow: var(--shadow-lg), 0 0 20px rgba(0, 0, 0, 0.5);
+}
+
+.quality-dropdown.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.quality-item {
+    padding: 10px 18px;
+    text-align: left;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--color-text-muted);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: var(--transition-fast);
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.quality-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: white;
+}
+
+.quality-item.active {
+    color: var(--color-accent);
+    font-weight: 700;
+}
+
+/* Gear Icon animation on hover/active */
+#quality-btn .icon-quality {
+    transition: transform var(--transition-normal);
+}
+
+.quality-container.active #quality-btn .icon-quality,
+#quality-btn:hover .icon-quality {
+    transform: rotate(45deg);
+}
+
+/* Fullscreen Specific Styles */
+.player-container:fullscreen {
+    width: 100vw !important;
+    height: 100vh !important;
+    max-width: none !important;
+    max-height: none !important;
+    aspect-ratio: auto !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+    background: #000 !important;
+}
+
+.player-container:fullscreen video {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+    object-fit: contain !important;
+}
+
+/* Webkit Fallback (Safari, older Chrome) */
+.player-container:-webkit-full-screen {
+    width: 100vw !important;
+    height: 100vh !important;
+    max-width: none !important;
+    max-height: none !important;
+    aspect-ratio: auto !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+    background: #000 !important;
+}
+
+.player-container:-webkit-full-screen video {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+    object-fit: contain !important;
+}
+
+/* Hide cursor when controls are inactive in fullscreen */
+.player-container:fullscreen:not(.controls-active) {
+    cursor: none;
+}
+

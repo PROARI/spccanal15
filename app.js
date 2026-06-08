@@ -31,6 +31,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const connectionStatusText = document.getElementById('connection-status');
     const customControls = document.getElementById('custom-controls');
 
+    // Quality Selector Elements
+    const qualityContainer = document.getElementById('quality-container');
+    const qualityBtn = document.getElementById('quality-btn');
+    const qualityDropdown = document.getElementById('quality-dropdown');
+
     // State Variables
     let hls = null;
     let isReconnecting = false;
@@ -57,17 +62,36 @@ document.addEventListener('DOMContentLoaded', () => {
             hls = null;
         }
 
+        // Connection Speed Checking & ABR Parameters
+        let isConnectionSlow = false;
+        if (navigator.connection) {
+            const conn = navigator.connection;
+            const type = conn.effectiveType;
+            const downlink = conn.downlink;
+            
+            if (type === '2g' || type === 'slow-2g' || type === '3g' || (downlink && downlink < 2.5)) {
+                isConnectionSlow = true;
+                console.log("Slow connection detected. Adjusting Hls.js parameters for maximum stability.");
+            }
+            
+            // Listen for changes
+            conn.removeEventListener('change', updateNetworkStatusUI);
+            conn.addEventListener('change', updateNetworkStatusUI);
+        }
+
         // Configure HLS.js with resilient recovery configurations
         const hlsConfig = {
             enableWorker: true,
-            lowLatencyMode: true,
-            backBufferLength: 30,
-            maxBufferLength: 30,
-            maxMaxBufferLength: 60,
-            manifestLoadingMaxRetry: 5,
+            lowLatencyMode: !isConnectionSlow,
+            backBufferLength: isConnectionSlow ? 15 : 30,
+            maxBufferLength: isConnectionSlow ? 45 : 30,
+            maxMaxBufferLength: isConnectionSlow ? 90 : 60,
+            manifestLoadingMaxRetry: 8,
             manifestLoadingRetryDelay: 1500,
-            levelLoadingMaxRetry: 5,
-            levelLoadingRetryDelay: 1500
+            levelLoadingMaxRetry: 8,
+            levelLoadingRetryDelay: 1500,
+            liveSyncPosition: isConnectionSlow ? 12 : 5,
+            liveMaxLatencyDuration: isConnectionSlow ? 25 : 10
         };
 
         if (Hls.isSupported()) {
@@ -79,7 +103,24 @@ document.addEventListener('DOMContentLoaded', () => {
             // Hls.js Events
             hls.on(Hls.Events.MANIFEST_PARSED, () => {
                 console.log("HLS Manifest parsed. Ready to play.");
+                setupQualitySelector();
                 attemptPlay();
+            });
+
+            hls.on(Hls.Events.LEVEL_SWITCHED, (event, data) => {
+                const currentLevelIndex = data.level;
+                console.log(`Hls.js switched to level index: ${currentLevelIndex}`);
+                
+                // Update active class in dropdown UI if in ABR mode
+                if (hls.currentLevel === -1) {
+                    const autoBtn = qualityDropdown.querySelector('.quality-item[data-level="-1"]');
+                    if (autoBtn && hls.levels[currentLevelIndex]) {
+                        const currentLevel = hls.levels[currentLevelIndex];
+                        const height = currentLevel.height || (currentLevel.attrs && currentLevel.attrs.RESOLUTION ? currentLevel.attrs.RESOLUTION.split('x')[1] : null);
+                        const name = height ? `${height}p` : '';
+                        autoBtn.textContent = name ? `Auto (${name})` : 'Auto';
+                    }
+                }
             });
 
             hls.on(Hls.Events.ERROR, (event, data) => {
@@ -91,6 +132,10 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log("Native HLS playback detected (Safari/iOS).");
             video.src = STREAM_URL;
             
+            if (qualityContainer) {
+                qualityContainer.style.display = 'none';
+            }
+            
             video.addEventListener('loadedmetadata', () => {
                 attemptPlay();
             });
@@ -101,6 +146,9 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             showOverlay(false, "Tu navegador no soporta transmisiones HLS.", false);
             overlaySpinner.style.display = 'none';
+            if (qualityContainer) {
+                qualityContainer.style.display = 'none';
+            }
         }
     }
 
@@ -116,8 +164,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 updatePlayPauseUI(true);
                 reconnectAttempts = 0;
                 isReconnecting = false;
-                connectionStatusText.textContent = "Estable";
-                connectionStatusText.style.color = "#25d366";
+                updateNetworkStatusUI();
                 startWatchdog();
             })
             .catch((error) => {
@@ -206,8 +253,7 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log(`Reconnection attempt ${reconnectAttempts} of ${MAX_RECONNECT_ATTEMPTS}...`);
         
         showOverlay(true, `${message} (Intento ${reconnectAttempts}/${MAX_RECONNECT_ATTEMPTS})`, true);
-        connectionStatusText.textContent = "Reconectando...";
-        connectionStatusText.style.color = "#ef4444";
+        updateNetworkStatusUI();
         
         if (reconnectAttempts > MAX_RECONNECT_ATTEMPTS) {
             console.error("Max reconnection attempts reached. Halting automatic retries.");
@@ -323,29 +369,77 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function toggleFullscreen() {
-        if (!document.fullscreenElement) {
-            playerContainer.requestFullscreen()
-                .then(() => {
-                    playerContainer.style.borderRadius = '0';
-                    iconFullscreen.style.display = 'none';
-                    iconExitFullscreen.style.display = 'block';
-                })
-                .catch(err => {
-                    console.error(`Error attempting fullscreen: ${err.message}`);
-                });
+        if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+            const requestFS = playerContainer.requestFullscreen || 
+                              playerContainer.webkitRequestFullscreen || 
+                              playerContainer.mozRequestFullScreen || 
+                              playerContainer.msRequestFullscreen;
+                              
+            if (requestFS) {
+                requestFS.call(playerContainer)
+                    .then(() => {
+                        playerContainer.style.borderRadius = '0';
+                        iconFullscreen.style.display = 'none';
+                        iconExitFullscreen.style.display = 'block';
+                        
+                        // Lock screen orientation to landscape on mobile
+                        if (screen.orientation && typeof screen.orientation.lock === 'function') {
+                            screen.orientation.lock('landscape')
+                                .then(() => {
+                                    console.log('Screen orientation locked to landscape');
+                                })
+                                .catch(err => {
+                                    console.warn('Could not lock screen orientation:', err);
+                                });
+                        }
+                    })
+                    .catch(err => {
+                        console.error(`Error attempting fullscreen: ${err.message}`);
+                    });
+            } else if (video.webkitEnterFullscreen) {
+                // Safari iOS iPhone fullscreen fallback
+                video.webkitEnterFullscreen();
+            }
         } else {
-            document.exitFullscreen();
+            const exitFS = document.exitFullscreen || 
+                           document.webkitExitFullscreen || 
+                           document.mozCancelFullScreen || 
+                           document.msExitFullscreen;
+            if (exitFS) {
+                exitFS.call(document);
+            }
         }
     }
 
     // Listening to native document fullscreen changes
-    document.addEventListener('fullscreenchange', () => {
-        if (!document.fullscreenElement) {
+    function handleFullscreenChange() {
+        const isFS = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement;
+        
+        if (!isFS) {
             playerContainer.style.borderRadius = '16px';
             iconFullscreen.style.display = 'block';
             iconExitFullscreen.style.display = 'none';
+            
+            // Unlock screen orientation when exiting fullscreen
+            if (screen.orientation && typeof screen.orientation.unlock === 'function') {
+                try {
+                    screen.orientation.unlock();
+                    console.log('Screen orientation unlocked');
+                } catch (err) {
+                    console.warn('Could not unlock screen orientation:', err);
+                }
+            }
+        } else {
+            playerContainer.style.borderRadius = '0';
+            iconFullscreen.style.display = 'none';
+            iconExitFullscreen.style.display = 'block';
         }
-    });
+    }
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+    document.addEventListener('mozfullscreenchange', handleFullscreenChange);
+    document.addEventListener('MSFullscreenChange', handleFullscreenChange);
 
     // ==========================================================================
     // Register Element Event Listeners
@@ -361,6 +455,43 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Fullscreen controls
     fullscreenBtn.addEventListener('click', toggleFullscreen);
+
+    // Toggle quality dropdown menu
+    qualityBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        qualityDropdown.classList.toggle('show');
+        qualityContainer.classList.toggle('active');
+    });
+
+    // Close quality dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!qualityContainer.contains(e.target)) {
+            qualityDropdown.classList.remove('show');
+            qualityContainer.classList.remove('active');
+        }
+    });
+
+    // Handle quality selection click
+    qualityDropdown.addEventListener('click', (e) => {
+        const item = e.target.closest('.quality-item');
+        if (!item) return;
+
+        const levelIndex = parseInt(item.getAttribute('data-level'), 10);
+        console.log(`User selected quality level index: ${levelIndex}`);
+
+        if (hls) {
+            hls.currentLevel = levelIndex;
+        }
+
+        // Update active class in dropdown UI
+        const items = qualityDropdown.querySelectorAll('.quality-item');
+        items.forEach(el => el.classList.remove('active'));
+        item.classList.add('active');
+
+        // Close dropdown
+        qualityDropdown.classList.remove('show');
+        qualityContainer.classList.remove('active');
+    });
 
     // Manual Reconnection trigger
     overlayRetryBtn.addEventListener('click', () => {
@@ -418,6 +549,70 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     });
+
+    // ==========================================================================
+    // Quality Selection & Connection Status Helpers
+    // ==========================================================================
+    
+    function setupQualitySelector() {
+        if (!hls) return;
+
+        // Clear existing dynamic items (keep first "Auto" button)
+        qualityDropdown.innerHTML = '<button class="quality-item active" data-level="-1">Auto</button>';
+
+        const levels = hls.levels;
+        console.log("HLS Quality levels found:", levels);
+
+        if (levels && levels.length > 1) {
+            levels.forEach((level, index) => {
+                const height = level.height || (level.attrs && level.attrs.RESOLUTION ? level.attrs.RESOLUTION.split('x')[1] : null);
+                const name = height ? `${height}p` : `Calidad ${index + 1}`;
+                const btn = document.createElement('button');
+                btn.className = 'quality-item';
+                btn.setAttribute('data-level', index);
+                btn.textContent = name;
+                qualityDropdown.appendChild(btn);
+            });
+            qualityContainer.style.display = 'inline-block';
+        } else if (levels && levels.length === 1) {
+            const level = levels[0];
+            const height = level.height || 720;
+            const name = `${height}p`;
+            
+            const btn = document.createElement('button');
+            btn.className = 'quality-item';
+            btn.setAttribute('data-level', '0');
+            btn.textContent = name;
+            qualityDropdown.appendChild(btn);
+            
+            qualityContainer.style.display = 'inline-block';
+        } else {
+            qualityContainer.style.display = 'none';
+        }
+    }
+
+    function updateNetworkStatusUI() {
+        if (isReconnecting) {
+            connectionStatusText.textContent = "Reconectando...";
+            connectionStatusText.style.color = "#ef4444";
+            return;
+        }
+        
+        if (navigator.connection) {
+            const conn = navigator.connection;
+            const type = conn.effectiveType;
+            const downlink = conn.downlink;
+            
+            if (type === '2g' || type === 'slow-2g' || type === '3g' || (downlink && downlink < 2.5)) {
+                connectionStatusText.textContent = "Red Lenta";
+                connectionStatusText.style.color = "#eab308";
+                return;
+            }
+        }
+        
+        connectionStatusText.textContent = "Estable";
+        connectionStatusText.style.color = "#25d366";
+    }
 
     // ==========================================================================
     // Application Boot
